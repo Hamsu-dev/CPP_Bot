@@ -1,9 +1,15 @@
+import os
+from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 from openai import OpenAI
 
+# Load environment variables from .env file
+load_dotenv()
+
 # Set up your OpenAI API key
-client = OpenAI(api_key='sk-proj-8uHMLztgsIhBL9QshtAAT3BlbkFJ9s0tdHng2WUtH8YJIVVe')
+openai_api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=openai_api_key)
 
 # Enable privileged intents
 intents = discord.Intents.default()
@@ -32,6 +38,9 @@ async def challenge(ctx):
         max_tokens=150
     )
     challenge = response.choices[0].message.content.strip()
-    await ctx.send(f"**C++ Coding Challenge**\n{challenge}")
+    usage = response.usage
 
-bot.run('MTI0MDg3OTcxODAwNjM5MDg3NQ.GAe-qG.D2BqtXAy17uVQaHBPvL_FbWcbskIEE-FBEPoUc')
+    # Send the challenge and usage information
+    await ctx.send(f"**C++ Coding Challenge**\n{challenge}\n\n**Usage**\nPrompt tokens: {usage.prompt_tokens}\nCompletion tokens: {usage.completion_tokens}\nTotal tokens: {usage.total_tokens}")
+
+bot.run(os.getenv('DISCORD_BOT_TOKEN'))
